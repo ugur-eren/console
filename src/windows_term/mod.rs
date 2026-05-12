@@ -405,11 +405,9 @@ pub(crate) fn read_secure() -> io::Result<String> {
             Key::Enter => {
                 break;
             }
-            Key::Char('\x08') => {
-                if !rv.is_empty() {
-                    let new_len = rv.len() - 1;
-                    rv.truncate(new_len);
-                }
+            Key::Char('\x08') if !rv.is_empty() => {
+                let new_len = rv.len() - 1;
+                rv.truncate(new_len);
             }
             Key::Char(c) => {
                 rv.push(c);
