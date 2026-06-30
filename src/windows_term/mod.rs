@@ -24,9 +24,9 @@ use windows_sys::Win32::System::Console::{
 };
 use windows_sys::Win32::UI::Input::KeyboardAndMouse::VIRTUAL_KEY;
 
-use crate::common_term;
 use crate::kb::Key;
 use crate::term::{Term, TermTarget};
+use crate::{common_term, is_dumb};
 
 #[cfg(feature = "windows-console-colors")]
 mod colors;
@@ -67,10 +67,7 @@ pub(crate) fn is_a_color_terminal(out: &Term) -> bool {
         return false;
     }
     if msys_tty_on(out) {
-        return match env::var("TERM") {
-            Ok(term) => term != "dumb",
-            Err(_) => true,
-        };
+        return !is_dumb();
     }
     enable_ansi_on(out)
 }
