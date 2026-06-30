@@ -1,5 +1,6 @@
 use alloc::sync::Arc;
 use core::fmt::{Debug, Display};
+use std::env;
 use std::io::{self, Read, Write};
 #[cfg(any(unix, all(target_os = "wasi", target_env = "p1")))]
 use std::os::fd::{AsRawFd, RawFd};
@@ -565,6 +566,26 @@ impl Term {
             }
         }
         Ok(())
+    }
+}
+
+/// A fast way to check if the application has a dumb terminal.
+///
+/// On Unix: `TERM` environment variable is not set or set to `dumb`.
+///
+/// On Windows: `TERM` environment variable is explicitly set to `dumb`.
+/// Native windows terminals typically do not set the `TERM` environment variable.
+#[inline]
+pub fn is_dumb() -> bool {
+    #[cfg(windows)]
+    let default = false;
+
+    #[cfg(not(windows))]
+    let default = true;
+
+    match env::var("TERM") {
+        Ok(term) => term == "dumb",
+        Err(_) => default,
     }
 }
 
